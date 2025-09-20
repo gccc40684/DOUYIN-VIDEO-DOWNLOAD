@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最简单的抖音视频信息提取器</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">最简单的抖音视频信息提取器</h1>
+            <p class="subtitle">获取抖音视频文案和无水印下载链接</p>
+        </header>
+
+        <main class="main">
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="url" id="urlInput" placeholder="请输入抖音视频链接..." class="url-input">
+                    <button id="fetchBtn" class="fetch-btn">
+                        <span class="btn-text">获取信息</span>
+                        <div class="loading-container hidden">
+                            <div class="loading-spinner"></div>
+                            <span class="loading-text">正在加速获取视频信息</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="results-section">
+                <div class="video-info hidden" id="videoInfo">
+                    <div class="info-card">
+                        <h3 class="card-title">视频信息</h3>
+                        <div class="video-meta">
+                            <!-- 视频标题 - 单独占一行 -->
+                            <div class="video-title-section">
+                                <div class="meta-item title-item">
+                                    <span class="meta-label">视频标题</span>
+                                    <span class="meta-value title-value" id="videoTitle">-</span>
+                                </div>
+                            </div>
+
+                            <!-- 基本信息 -->
+                            <div class="video-meta-section">
+                                <h4 class="video-meta-section-title">📋 基本信息</h4>
+                                <div class="video-meta-grid">
+                                    <div class="meta-item highlight">
+                                        <span class="meta-label">作者</span>
+                                        <span class="meta-value large" id="authorName">-</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-label">发布时间</span>
+                                        <span class="meta-value" id="publishTime">-</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span class="meta-label">视频ID</span>
+                                        <span class="meta-value number" id="videoId">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 统计数据 -->
+                            <div class="video-meta-section">
+                                <h4 class="video-meta-section-title">📊 统计数据</h4>
+                                <div class="video-meta-grid">
+                                    <div class="meta-item stats">
+                                        <span class="meta-label">点赞数</span>
+                                        <span class="meta-value number" id="likeCount">-</span>
+                                    </div>
+                                    <div class="meta-item stats">
+                                        <span class="meta-label">评论数</span>
+                                        <span class="meta-value number" id="commentCount">-</span>
+                                    </div>
+                                    <div class="meta-item stats">
+                                        <span class="meta-label">分享数</span>
+                                        <span class="meta-value number" id="shareCount">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section hidden" id="contentSection">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3 class="card-title">视频简介</h3>
+                            <button id="exportBtn" class="export-btn">导出</button>
+                        </div>
+                        <div class="content-display">
+                            <textarea id="videoContent" readonly placeholder="视频简介将在这里显示..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="download-section hidden" id="downloadSection">
+                    <div class="download-card">
+                        <h3 class="card-title">下载链接（无水印）</h3>
+                        <div class="download-links">
+                            <a id="downloadLink" href="#" target="_blank" class="download-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                                </svg>
+                                下载视频（无水印）
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="error-message hidden" id="errorMessage">
+                    <div class="error-card">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                        <p id="errorText">出现错误，请检查链接是否正确</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="author-section" id="authorSection">
+            <div class="author-avatar">
+                <img src="assets/myImg.jpg" alt="作者头像" class="avatar-img">
+            </div>
+            <div class="author-info">
+                <h2 class="author-name">凡人</h2>
+                <p class="author-desc">专注AI 编程开发，提供简单实用的工具</p>
+                <div class="author-tags">
+                    <span class="tag">AI编程</span>
+                    <span class="tag">工具开发</span>
+                    <span class="tag">用户体验</span>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2024 抖音视频信息提取器. 仅供学习交流使用.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
