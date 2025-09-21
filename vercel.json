@@ -2,8 +2,7 @@
   "version": 2,
   "functions": {
     "api/*.js": {
-      "maxDuration": 30,
-      "runtime": "nodejs18.x"
+      "maxDuration": 30
     }
   }
 }
