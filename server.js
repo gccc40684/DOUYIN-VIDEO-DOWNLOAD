@@ -485,10 +485,13 @@ app.post('/api/extract-content', async (req, res) => {
 });
 */
 
-app.listen(PORT, () => {
-    console.log(`🚀 服务器运行在 http://localhost:${PORT}`);
-    console.log('📱 现在可以正常获取抖音视频信息了！');
-    // console.log('📝 文案提取服务已启动！'); // 已注释（文案提取功能已禁用）
-});
+// Vercel兼容性：只在本地开发时启动服务器
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 服务器运行在 http://localhost:${PORT}`);
+        console.log('📱 现在可以正常获取抖音视频信息了！');
+        // console.log('📝 文案提取服务已启动！'); // 已注释（文案提取功能已禁用）
+    });
+}
 
 module.exports = app;
