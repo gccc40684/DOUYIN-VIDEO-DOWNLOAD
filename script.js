@@ -185,76 +185,24 @@ class DouyinVideoExtractor {
     }
 
     async useWorkingAPI(url) {
-        // 使用一些仍然可用的免费API
-        const workingApis = [
-            {
-                url: 'https://api.snapany.com/api/dy/info',
-                method: 'POST',
-                body: { url: url }
-            }
-        ];
-
-        for (const api of workingApis) {
-            try {
-                const response = await fetch(api.url, {
-                    method: api.method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X)'
-                    },
-                    body: JSON.stringify(api.body)
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.code === 200 || data.success) {
-                        return this.formatApiResponse(data);
-                    }
-                }
-            } catch (error) {
-                console.warn(`API ${api.url} 失败:`, error);
-                continue;
-            }
+        // 备用方案：再次尝试本地代理API
+        try {
+            console.log('🔄 备用方案：重试本地代理API');
+            return await this.useLocalProxy(url);
+        } catch (error) {
+            console.error('备用方案也失败:', error);
+            throw new Error('所有API都不可用，请检查网络连接');
         }
-
-        throw new Error('所有备用API都不可用');
     }
 
     async useThirdPartyAPI(url) {
-        // 使用真实的免费抖音解析API
-        const apiEndpoints = [
-            'https://api.douyin.wtf/api',
-            'https://douyin.iiilab.com/api'
-        ];
-
-        for (const apiUrl of apiEndpoints) {
-            try {
-                const response = await fetch(`${apiUrl}?url=${encodeURIComponent(url)}`, {
-                    method: 'GET',
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15',
-                        'Referer': 'https://www.douyin.com/'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.code === 0 || data.success) {
-                    return this.formatApiResponse(data);
-                }
-
-                throw new Error(data.message || '解析失败');
-            } catch (error) {
-                console.warn(`API ${apiUrl} 失败:`, error);
-                if (apiUrl === apiEndpoints[apiEndpoints.length - 1]) {
-                    throw error;
-                }
-                continue;
-            }
+        // 第三方API备用方案：也使用本地代理
+        try {
+            console.log('🔄 第三方API备用方案：使用本地代理');
+            return await this.useLocalProxy(url);
+        } catch (error) {
+            console.error('第三方API备用方案失败:', error);
+            throw new Error('所有解析方案都不可用');
         }
     }
 
