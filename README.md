@@ -32,7 +32,7 @@
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/your-username/DOUYIN-VIDEO-DOWNLOAD.git
+   git clone https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD.git
    cd DOUYIN-VIDEO-DOWNLOAD
    ```
 
@@ -149,7 +149,7 @@ NODE_ENV=development
 ## 📞 联系方式
 
 - 作者: 凡人
-- 项目地址: [https://github.com/your-username/DOUYIN-VIDEO-DOWNLOAD](https://github.com/your-username/DOUYIN-VIDEO-DOWNLOAD)
+- 项目地址: [https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD](https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD)
 
 ## 🙏 致谢
 

@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "最简单的抖音视频信息提取器 - 纯免费API方案",
   "main": "server.js",
-  "homepage": "https://github.com/your-username/DOUYIN-VIDEO-DOWNLOAD",
+  "homepage": "https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/DOUYIN-VIDEO-DOWNLOAD.git"
+    "url": "https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/DOUYIN-VIDEO-DOWNLOAD/issues"
+    "url": "https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD/issues"
   },
   "scripts": {
     "start": "node server.js",
@@ -41,7 +41,7 @@
   "author": {
     "name": "凡人",
     "email": "your-email@example.com",
-    "url": "https://github.com/your-username"
+    "url": "https://github.com/gccc40684"
   },
   "license": "MIT",
   "engines": {
