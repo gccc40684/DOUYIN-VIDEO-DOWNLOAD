@@ -1,5 +1,7 @@
-// Vercel API函数：抖音视频解析（无外部依赖版本）
-export default async function handler(req, res) {
+// Vercel API函数：抖音视频解析（CommonJS版本）
+const axios = require('axios');
+
+module.exports = async function handler(req, res) {
     // 设置CORS头
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -30,8 +32,8 @@ export default async function handler(req, res) {
         
         console.log('🔍 开始解析链接:', url);
         
-        // 使用原生fetch进行API调用
-        const result = await parseDouyinVideoWithFetch(url);
+        // 使用axios解析抖音视频
+        const result = await parseDouyinVideoWithAxios(url);
         
         console.log('✅ 解析成功:', result.success ? '是' : '否');
         
@@ -47,35 +49,25 @@ export default async function handler(req, res) {
     }
 }
 
-// 使用原生fetch解析抖音视频
-async function parseDouyinVideoWithFetch(url) {
+// 使用axios解析抖音视频
+async function parseDouyinVideoWithAxios(url) {
     try {
         // 尝试多个API端点
         const apiEndpoints = [
             {
                 url: 'https://api.snapany.com/api/dy/info',
                 method: 'POST',
-                body: { url: url }
+                data: { url: url }
             },
             {
                 url: 'https://api.douyin.wtf/api',
                 method: 'POST', 
-                body: { url: url }
+                data: { url: url }
             },
             {
                 url: 'https://api.tikwm.com/api',
                 method: 'POST',
-                body: { url: url }
-            },
-            {
-                url: 'https://api.douyin.wtf/api?url=' + encodeURIComponent(url),
-                method: 'GET',
-                body: null
-            },
-            {
-                url: 'https://api.snapany.com/api/dy/info?url=' + encodeURIComponent(url),
-                method: 'GET',
-                body: null
+                data: { url: url }
             }
         ];
         
@@ -83,24 +75,21 @@ async function parseDouyinVideoWithFetch(url) {
             try {
                 console.log(`🔄 尝试API: ${api.url}`);
                 
-                const fetchOptions = {
+                const response = await axios({
+                    url: api.url,
                     method: api.method,
+                    data: api.data,
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15',
                         'Accept': 'application/json',
-                        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
-                    }
-                };
+                        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                        'Content-Type': 'application/json'
+                    },
+                    timeout: 10000
+                });
                 
-                if (api.body) {
-                    fetchOptions.headers['Content-Type'] = 'application/json';
-                    fetchOptions.body = JSON.stringify(api.body);
-                }
-                
-                const response = await fetch(api.url, fetchOptions);
-                
-                if (response.ok) {
-                    const data = await response.json();
+                if (response.status === 200 && response.data) {
+                    const data = response.data;
                     console.log(`✅ API ${api.url} 成功`);
                     
                     // 标准化返回格式
