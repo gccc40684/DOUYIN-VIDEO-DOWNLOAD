@@ -1,6 +1,4 @@
-// Vercel API函数：URL展开
-const axios = require('axios');
-
+// Vercel API函数：URL展开（无外部依赖版本）
 export default async function handler(req, res) {
     // 设置CORS头
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -30,16 +28,12 @@ export default async function handler(req, res) {
             return;
         }
         
-        const response = await axios.get(url, {
-            maxRedirects: 5,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15'
-            }
-        });
-
+        // 使用原生fetch展开URL
+        const expandedUrl = await expandUrlWithFetch(url);
+        
         res.json({
             success: true,
-            expandedUrl: response.request.res.responseUrl || url
+            expandedUrl: expandedUrl
         });
         
     } catch (error) {
@@ -49,5 +43,24 @@ export default async function handler(req, res) {
             error: error.message,
             expandedUrl: req.query.url
         });
+    }
+}
+
+// 使用原生fetch展开URL
+async function expandUrlWithFetch(url) {
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            redirect: 'follow',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15'
+            }
+        });
+        
+        return response.url || url;
+        
+    } catch (error) {
+        console.error('URL展开失败:', error.message);
+        return url; // 返回原始URL
     }
 }
