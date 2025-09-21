@@ -149,6 +149,7 @@ NODE_ENV=development
 ## 📞 联系方式
 
 - 作者: 凡人
+- 公众号：凡人的AI工具箱
 - 项目地址: [https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD](https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD)
 
 ## 🙏 致谢
