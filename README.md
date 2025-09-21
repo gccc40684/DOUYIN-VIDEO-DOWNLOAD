@@ -151,6 +151,7 @@ NODE_ENV=development
 - 作者: 凡人
 - 公众号：凡人的AI工具箱
 - 项目地址: [https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD](https://github.com/gccc40684/DOUYIN-VIDEO-DOWNLOAD)
+<img width="442" height="422" alt="image" src="https://github.com/user-attachments/assets/68095a1c-74ee-4343-ae8f-004e9c84d562" />
 
 ## 🙏 致谢
 
