@@ -480,14 +480,20 @@ class DouyinVideoExtractor {
         };
 
         copyBtn.onclick = () => {
-            navigator.clipboard.writeText(videoUrl).then(() => {
-                copyBtn.innerHTML = '✅ 已复制';
-                setTimeout(() => {
-                    copyBtn.innerHTML = '📋 复制视频链接';
-                }, 2000);
-            }).catch(() => {
-                alert('复制失败，请手动复制链接');
-            });
+            // 检查是否支持Clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(videoUrl).then(() => {
+                    copyBtn.innerHTML = '✅ 已复制';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '📋 复制视频链接';
+                    }, 2000);
+                }).catch(() => {
+                    this.fallbackCopyText(videoUrl, copyBtn);
+                });
+            } else {
+                // 使用备用复制方法
+                this.fallbackCopyText(videoUrl, copyBtn);
+            }
         };
 
         proxyBtn.onclick = () => {
@@ -781,7 +787,7 @@ class DouyinVideoExtractor {
                     </div>
                     
                     <div class="action-buttons" style="margin-top: 20px; display: flex; gap: 10px;">
-                        <button class="btn btn-primary" onclick="navigator.clipboard.writeText('${(data.fullContent || data.description).replace(/'/g, "\\'")}'); alert('文案已复制到剪贴板！')">复制文案</button>
+                        <button class="btn btn-primary" onclick="this.copyText('${(data.fullContent || data.description).replace(/'/g, "\\'")}')">复制文案</button>
                         <button class="btn btn-secondary" onclick="document.querySelector('.modal').remove()">关闭</button>
                     </div>
                 </div>
@@ -1727,7 +1733,7 @@ class DouyinVideoExtractor {
                             ${finalText}
                         </div>
                         <div style="margin-top: 12px;">
-                            <button onclick="navigator.clipboard.writeText('${finalText.replace(/'/g, "\\'")}')" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 8px;">
+                            <button onclick="this.copyText('${finalText.replace(/'/g, "\\'")}')" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 8px;">
                                 复制文本
                             </button>
                             <button onclick="document.querySelector('.modal').remove()" style="padding: 8px 16px; background: #007AFF; color: white; border: none; border-radius: 6px; cursor: pointer;">
@@ -2399,7 +2405,7 @@ client.recognize({ audio, config })
                     </div>
                     
                     <div class="action-buttons" style="margin-top: 20px; display: flex; gap: 10px;">
-                        <button class="btn btn-primary" onclick="navigator.clipboard.writeText('${text.replace(/'/g, "\\'")}'); alert('文本已复制到剪贴板！')">复制文本</button>
+                        <button class="btn btn-primary" onclick="this.copyText('${text.replace(/'/g, "\\'")}')">复制文本</button>
                         <button class="btn btn-secondary" onclick="document.querySelector('.modal').remove()">关闭</button>
                     </div>
                 </div>
@@ -2726,7 +2732,210 @@ class DouyinAPIService {
             musicTitle: '原创音乐'
         };
     }
+
+    // 备用复制方法，兼容不支持Clipboard API的浏览器
+    fallbackCopyText(text, button) {
+        try {
+            // 创建临时文本区域
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            // 尝试使用execCommand复制
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            if (successful) {
+                button.innerHTML = '✅ 已复制';
+                setTimeout(() => {
+                    button.innerHTML = '📋 复制视频链接';
+                }, 2000);
+            } else {
+                // 如果execCommand也失败，显示文本让用户手动复制
+                this.showCopyDialog(text, button);
+            }
+        } catch (err) {
+            console.warn('复制失败:', err);
+            this.showCopyDialog(text, button);
+        }
+    }
+
+    // 显示复制对话框
+    showCopyDialog(text, button) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+        
+        modal.innerHTML = `
+            <div class="modal-content" style="
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                max-width: 500px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+            ">
+                <h3 style="margin: 0 0 15px 0; color: #333;">手动复制链接</h3>
+                <p style="margin: 0 0 15px 0; color: #666;">请手动复制以下链接：</p>
+                <textarea readonly style="
+                    width: 100%;
+                    height: 100px;
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    font-size: 12px;
+                    resize: vertical;
+                ">${text}</textarea>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
+                        padding: 8px 16px;
+                        background: #007AFF;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    ">关闭</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // 自动选中文本
+        const textarea = modal.querySelector('textarea');
+        textarea.select();
+        
+        // 点击模态框外部关闭
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        };
+    }
 }
+
+// 全局复制函数，用于内联onclick事件
+window.copyText = function(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('文本已复制到剪贴板！');
+        }).catch(() => {
+            fallbackCopyText(text);
+        });
+    } else {
+        fallbackCopyText(text);
+    }
+};
+
+// 全局备用复制函数
+window.fallbackCopyText = function(text) {
+    try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (successful) {
+            alert('文本已复制到剪贴板！');
+        } else {
+            showCopyDialog(text);
+        }
+    } catch (err) {
+        console.warn('复制失败:', err);
+        showCopyDialog(text);
+    }
+};
+
+// 全局显示复制对话框函数
+window.showCopyDialog = function(text) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        ">
+            <h3 style="margin: 0 0 15px 0; color: #333;">手动复制文本</h3>
+            <p style="margin: 0 0 15px 0; color: #666;">请手动复制以下文本：</p>
+            <textarea readonly style="
+                width: 100%;
+                height: 150px;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-family: monospace;
+                font-size: 12px;
+                resize: vertical;
+            ">${text}</textarea>
+            <div style="margin-top: 15px; text-align: right;">
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
+                    padding: 8px 16px;
+                    background: #007AFF;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                ">关闭</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // 自动选中文本
+    const textarea = modal.querySelector('textarea');
+    textarea.select();
+    
+    // 点击模态框外部关闭
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    };
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     new DouyinVideoExtractor();
